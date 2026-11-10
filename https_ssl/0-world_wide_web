@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+# Displays information about the subdomains of a given domain
+
+display_info() {
+    local domain="$1"
+    local sub="$2"
+
+    dig "${sub}.${domain}" | awk -v s="$sub" '
+        /ANSWER SECTION:/ {
+            getline
+            print "The subdomain " s " is a " $4 " record and points to " $5
+        }
+    '
+}
+
+domain="$1"
+subdomain="$2"
+
+if [ -n "$subdomain" ]; then
+    display_info "$domain" "$subdomain"
+else
+    for sub in www lb-01 web-01 web-02; do
+        display_info "$domain" "$sub"
+    done
+fi
